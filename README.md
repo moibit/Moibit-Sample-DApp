@@ -25,7 +25,7 @@ It also allows users to view and list their files. All these features are enable
 #### Install the following dependencies:
 [Create React App](https://github.com/facebookincubator/create-react-app) is an intuitive package and is the best way to start building a new  [single page](https://reactjs.org/docs/glossary.html#single-page-application)  application in React.
 
-```
+``` bash
 npx create-react-app beta-sample-dapp
 cd beta-sample-dapp
 npm install web3 --save #middleware to interact with ethereum
@@ -44,7 +44,7 @@ To deploy the smart contract go to  [https://remix.ethereum.org](https://remix.e
 
 paste the following codes in **_/src/middleware/sampleBetaAppContract.js_**
 
-```
+``` js
 pragma solidity ^0.5.5;
 pragma experimental ABIEncoderV2;
 
@@ -92,12 +92,12 @@ Save the address of the smart contract. For this dApp it is: ```0xdBa8EC446B8fa8
 Also, save the Application Binary Interface (ABI) in JSON. It can be found under solidity complier plugin
 For this dApp it is:
 
-```
+``` json
 [ { "constant": false, "inputs": [ { "name": "_fileName", "type": "string" }, { "name": "_fileHash", "type": "string" } ], "name": "setHash", "outputs": [ { "name": "setBool", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "allFiles", "outputs": [ { "name": "fileName", "type": "string" }, { "name": "fileHash", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "string" } ], "name": "file2Hashes", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_fileName", "type": "string" } ], "name": "getHashByName", "outputs": [ { "name": "_fileHash", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getList", "outputs": [ { "components": [ { "name": "fileName", "type": "string" }, { "name": "fileHash", "type": "string" } ], "name": "retFiles", "type": "tuple[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "listAllHashes", "outputs": [ { "components": [ { "name": "fileName", "type": "string" }, { "name": "fileHash", "type": "string" } ], "name": "retFiles", "type": "tuple[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "address" }, { "name": "", "type": "uint256" } ], "name": "user_files", "outputs": [ { "name": "fileName", "type": "string" }, { "name": "fileHash", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" } ]
 ```
 
 In the **_/src/middleware/web3.js_** 
-```
+``` js
 import BetaAPI from './SampleBetaApp.json';
 import Web3 from 'web3';
 var web3;
@@ -126,7 +126,7 @@ The above code helps to connect with the contract deployed and make use of the f
 >_To make it simple we are going to use first address in metamask as **Admin** and remaining addresses as his/her users._
 
 in file **_/src/middleware/credentials.js_**
-```
+``` js
 //You need to update each credentials as displayed on your moibit api dashboard.
 
 export default {
@@ -137,7 +137,7 @@ export default {
 }
 ```
 in **_/src/container/dapp.js_**
-```
+``` js
 import  React, { Component } from  'react';
 import  Layout  from  '../component/layout.js';
 class  Dapp  extends  Component {
@@ -153,7 +153,7 @@ The above code will render the layout below which helps to explore all routes of
 
 #### Let's go into the details
 in **_src/component/tableList_**
-```
+``` js
 import React from 'react';
 import { Table,Icon } from 'semantic-ui-react';
 import '../App.css';
@@ -228,7 +228,7 @@ export default TableList;
 this is a re-usable component for rendering the list of files in table format
 
 in **/src/component/layout.js**
-```
+``` js
 import React, { Component } from 'react';
 import '../App.css';
 import { Image, Table, Button, Input, Form } from 'semantic-ui-react';
@@ -529,14 +529,14 @@ export default Layout;
 on clicking submit the file will be added to MoiBit using the following route:
 
 >_**YOUR_IP/moibit/writefile"**_ is a post call used to upload/add a file to your directory in MoiBit, which expects a **form data**
-```
+``` js
 {
 	file : <file_of_any_type>,
 	fileName:<absoulte_path_of_the_file> // means if you want to add a file to folder called 'X', then fileName : 'X'+ '<file_name>',
 }		
 ```
 which will return back following response :  
-```
+``` json
 {
     "meta": {
         "code": 200,
@@ -554,7 +554,7 @@ which will return back following response :
 }
 ```
 for provenance and utility we are storing the file hash into blockchain , where you have to confirm in the metamask popup for which we use the following code:
-```
+``` js
 await Instance.Config.methods.setHash(<file_name>, <file_hash>).send({ from:  <logged_in_account> });
 ```
 
@@ -571,7 +571,7 @@ once the file is uploaded you can see the file listed in the image above. You ca
 
 >_**IP/moibit/listFiles**_ is a post call used to get the files from a folder, which expects JSON data with a single attribute ```{ path : <path> }```, if the path is '/' it will return all the files that were uploaded to the root path using your API_KEY and API_SECRET and return the following response:
 	
-```
+``` json
   {
     "meta": {
         "code": 200,
@@ -620,6 +620,12 @@ When you click the file the verification will fail because it was changed off-ch
 1. [Vuppala Sai Prashanth](https://github.com/its-VSP)
 2. [Arunprakash](https://github.com/Arunprakash1414)
 
-## Contributors
+## Reviewed by
 1. Ayush Gupta
 2. Ganesh Prasad Kumble
+
+## Support
+If you need any help with the app at all, please feel free to file an issue or reach out to hello@moibit.io
+
+## License
+[GNU General Public License v3.0](https://github.com/moibit/Moibit-Sample-DApp/blob/master/LICENSE)
