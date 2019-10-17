@@ -5,8 +5,8 @@ import MoiBit from '../moibit_logo_transparent.png';
 import TableList from './tableList';
 import credentials from '../middleware/credentials';
 import Instance from '../middleware/web3';
-import axios from 'axios';
 import ShowModal from './modal';
+import Matic from 'maticjs';
 class Layout extends Component {
     state = {
         fileList: [],
@@ -18,51 +18,59 @@ class Layout extends Component {
         fileType: '',
         modalOpen: false,
         fileName: '',
+        matic : {},
+        API_KEY : '',
+        API_SECRET : ''
     }
     async componentDidMount() {
-
-        let acc = await Instance.web3.eth.getAccounts();
-        this.setState({ accountId: acc[0] });
-        this.observe();
-        axios.defaults.headers.common['api_key'] = credentials.API_KEY;
-        axios.defaults.headers.common['api_secret'] = credentials.API_SECRET;
-
-        if (acc[0] === credentials.ADMIN) {
+        try {
+            let acc = await Instance.web3.eth.getAccounts();
+            this.setState({ accountId: acc[0] });
+            this.observe();
+        
+            let _matic = new Matic({ 
+                maticProvider : window.web3.currentProvider 
+            });
+            await _matic.files.init(credentials.CUSTOM_URL,{
+                API_KEY : credentials.API_KEY,
+                API_SECRET : credentials.API_SECRET
+            });
+            this.setState({
+                matic : _matic,
+                API_KEY : credentials.API_KEY,
+                API_SECRET : credentials.API_SECRET
+            });
             this.getALLHashes();
-        }
-        else {
-            this.getFileHash();
+        }catch(e) {
+            console.log(e);       
         }
     }
 
-    getFileHash = async () => {
-        let data = await Instance.Config.methods.getList().call({ from: this.state.accountId });
-        let actual = [];
-        if(data.length !== 0) {
-            for (let i = 0; i < data.length; i++) {
-                actual.push({
-                        Name :  data[i].fileName.split("/")[1],
-                        Hash :  data[i].fileHash,
-                        verfiledBoolean : 0
-                    });
-            }
-        }
-        this.setState({ fileList: actual });
-    }
+    // getFileHash = async () => {
+    //     let data = await Instance.Config.methods.getList().call({ from: this.state.accountId });
+    //     let actual = [];
+    //     if(data.length !== 0) {
+    //         for (let i = 0; i < data.length; i++) {
+    //             actual.push({
+    //                     Name :  data[i].fileName.split("/")[1],
+    //                     Hash :  data[i].fileHash,
+    //                     verfiledBoolean : 0
+    //                 });
+    //         }
+    //     }
+    //     this.setState({ fileList: actual });
+    // }
 
     getALLHashes = async () => {
-        let response = await axios({
-            method: 'post',
-            url: credentials.CUSTOM_URL+"/moibit/listfiles",
-            data: { path: "/" }
-        });
+        let response = await this.state.matic.files.list();
+        console.log(response);
         let data = [];
-        if(response.data.data.Entries !== null) {
-            for (let i = 0; i < response.data.data.Entries.length; i++) {
-                if (response.data.data.Entries[i].Type === 0) {
+        if(response !== null) {
+            for (let i = 0; i < response.length; i++) {
+                if (response[i].Type === 0) {
                     await data.push({
-                        Name :  response.data.data.Entries[i].Name,
-                        Hash :  response.data.data.Entries[i].Hash,
+                        Name :  response[i].Name,
+                        Hash :  response[i].Hash,
                         verfiledBoolean : 0
                     });
                 }
@@ -73,27 +81,10 @@ class Layout extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
         if (this.state.file !== "") {
-            let formData = new FormData();
-            formData.append('file', this.state.file);
-            formData.append('fileName', '/' + this.state.file.name);
             this.setState({ loading: true });
-
-            let response = await axios({
-                method: 'post',
-                url: credentials.CUSTOM_URL+"/moibit/writefile",
-                data: formData
-            });
-            const actualFileName = credentials.API_KEY + "" + response.data.data.Path + "" + response.data.data.Name;
-            await Instance.Config.methods.setHash(actualFileName, response.data.data.Hash).send({ from: this.state.accountId });
-            if (this.state.accountId === credentials.ADMIN) {
-                this.getALLHashes();
-                this.setState({ loading: false });
-            }
-            else {
-                this.getFileHash();
-                this.setState({ loading: false });
-            }
+            await this.state.matic.files.add(this.state.file,this.state.file.name);
             this.setState({ loading: false });
+            this.getALLHashes();
         }
         else {
             this.setState({ fieldReq: true })
@@ -117,21 +108,7 @@ class Layout extends Component {
         }
     }
 
-    checkForProvenence = async (name,hash) => {
-        let response = await axios({
-            method: 'post',
-            url: credentials.CUSTOM_URL+"/moibit/listfiles",
-            data: { path: "/" }
-        });
-
-        let allFiles = response.data.data.Entries;
-        const index1 = allFiles.map(e => e.Name).indexOf(name);
-        let checkingHash = '';
-        if(index1 != -1) {
-            checkingHash = allFiles[index1].Hash;
-        }
-        
-
+    readFile = async (hash,name) => {
         let successs = true;
         let files = this.state.fileList;
         const index = files.map(e => e.Name).indexOf(name);
@@ -142,80 +119,47 @@ class Layout extends Component {
                 verfiledBoolean : 2
             }
             this.setState({fileList : files});
-
-            /* we are rendering all the root files so we are adding / in prefix to file name */
-            const filename = credentials.API_KEY+'/'+name; 
-            if(checkingHash == await Instance.Config.methods.getHashByName(filename).call()) {
-                files[index] = {
-                    Name :  name,
-                    Hash :  hash,
-                    verfiledBoolean : 1
-                }
-                this.setState({fileList : files});
-            }
-            else {
-                files[index] = {
-                    Name :  name,
-                    Hash :  hash,
-                    verfiledBoolean : -1
-                }
-                this.setState({fileList : files});
-                successs = false;
-            }
-            return successs;
-        }
-        else {
-            return successs;
-        }
-    }
-
-    readFile = async (filehash, fileName) => {
-        if(await this.checkForProvenence(fileName,filehash)) {
-            var responseType = '';
-            if (fileName.substr(-3, 3) === "txt" || fileName.substr(-3, 3) === "csv" || fileName.substr(-3, 3) === "php" || fileName.substr(-3, 3) === "html" || fileName.substr(-2, 2) === "js") {
-                responseType = '';
-            }
-            else {
-                responseType = 'blob';
-            }
-            const url = credentials.CUSTOM_URL+'/moibit/readfilebyhash';
-            axios({
-                method: 'post',
-                url: url,
-                responseType: responseType,
-                data: {
-                    hash: filehash
-                }
-            })
+            var responseType = 'blob';
+            this.state.matic.files.read(name,responseType)
             .then(response => {
-                if (typeof (response.data) == "string") {
-                    this.setState({ readFileIframe: response.data,
-                        fileType: response.headers['content-type'],
-                        fileName: fileName,
-                        modalOpen: true
-                    });
-                }
-                else {
-                    this.setState({
-                        readFileIframe: window.URL.createObjectURL(new Blob([response.data], {type:response.headers['content-type']})),
-                        fileType: response.headers['content-type'],
-                        fileName: fileName,
-                        modalOpen: true 
-                    })
-                }
+                    if(response !== 'File modified off-chain') {
+                             files[index] = {
+                            Name :  name,
+                            Hash :  hash,
+                            verfiledBoolean : 1
+                        }
+                        this.setState({
+                            fileList : files,
+                            readFileIframe: window.URL.createObjectURL(new Blob([response.data], {type:response.contentType})),
+                            fileType: response.contentType,
+                            fileName: name,
+                            modalOpen: true 
+                        })
+                    }
+                    else {
+                        files[index] = {
+                                    Name :  name,
+                                    Hash :  hash,
+                                    verfiledBoolean : -1
+                        }
+                        this.setState({
+                            fileList : files,
+                            readFileIframe: "App cannot verify the file as the current hash is not recorded on matic network",
+                            fileType: 'text/alert',
+                            fileName: 'Unable to render file',
+                            modalOpen: true
+                        });
+                    }
             })
             .catch(error => {
                 console.log(error);
             });
         }
         else {
-            this.setState({ readFileIframe: "The file got modified off-chain",
-                            fileType: 'text/plain',
-                            fileName: 'Alert!',
-                            modalOpen: true
-                        });
+            return successs;
         }
     }
+
     modalClose = () => {
         this.setState({ modalOpen: false });
     }
@@ -261,13 +205,13 @@ class Layout extends Component {
                                     <Table.HeaderCell style={custom_header}>
                                         <Table.Row>
                                             <Table.Cell colSpan='2'>
-                                                API_KEY : {credentials.API_KEY}
+                                                API_KEY : {this.state.API_KEY}
                                             </Table.Cell>
                                         </Table.Row>
                                         <Table.Row>
                                             <Table.Cell colSpan='2'>
                                                 <div style={{ wordWrap: 'break-word', width: '600px' }}>
-                                                    API_SECRET : {credentials.API_SECRET}
+                                                    API_SECRET : {this.state.API_SECRET}
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
