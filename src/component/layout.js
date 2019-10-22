@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import '../App.css';
 import { Image, Table, Button, Input, Form } from 'semantic-ui-react';
-import MoiBit from '../moibit_logo_transparent.png';
+import MoiBitLogo from '../moibit_logo_transparent.png';
 import TableList from './tableList';
 import credentials from '../middleware/credentials';
 import Instance from '../middleware/web3';
 import ShowModal from './modal';
 import Matic from 'maticjs';
+import MFiles from '@moibitjs/matic';
 class Layout extends Component {
     state = {
         fileList: [],
@@ -18,7 +19,7 @@ class Layout extends Component {
         fileType: '',
         modalOpen: false,
         fileName: '',
-        matic : {},
+        files : {},
         API_KEY : '',
         API_SECRET : ''
     }
@@ -29,14 +30,17 @@ class Layout extends Component {
             this.observe();
         
             let _matic = new Matic({ 
+                parentProvider : 'https://ropsten.infura.io/v3/70645f042c3a409599c60f96f6dd9fbc',
                 maticProvider : window.web3.currentProvider 
             });
-            await _matic.files.init(credentials.CUSTOM_URL,{
+
+            var files = new MFiles(_matic);
+            await files.init(credentials.CUSTOM_URL,{
                 API_KEY : credentials.API_KEY,
                 API_SECRET : credentials.API_SECRET
             });
             this.setState({
-                matic : _matic,
+                files : files,
                 API_KEY : credentials.API_KEY,
                 API_SECRET : credentials.API_SECRET
             });
@@ -46,24 +50,8 @@ class Layout extends Component {
         }
     }
 
-    // getFileHash = async () => {
-    //     let data = await Instance.Config.methods.getList().call({ from: this.state.accountId });
-    //     let actual = [];
-    //     if(data.length !== 0) {
-    //         for (let i = 0; i < data.length; i++) {
-    //             actual.push({
-    //                     Name :  data[i].fileName.split("/")[1],
-    //                     Hash :  data[i].fileHash,
-    //                     verfiledBoolean : 0
-    //                 });
-    //         }
-    //     }
-    //     this.setState({ fileList: actual });
-    // }
-
     getALLHashes = async () => {
-        let response = await this.state.matic.files.list();
-        console.log(response);
+        let response = await this.state.files.list();
         let data = [];
         if(response !== null) {
             for (let i = 0; i < response.length; i++) {
@@ -78,11 +66,12 @@ class Layout extends Component {
         }
         this.setState({ fileList: data });
     }
+
     handleSubmit = async (e) => {
         e.preventDefault();
         if (this.state.file !== "") {
             this.setState({ loading: true });
-            await this.state.matic.files.add(this.state.file,this.state.file.name);
+            await this.state.files.add(this.state.file,this.state.file.name);
             this.setState({ loading: false });
             this.getALLHashes();
         }
@@ -120,9 +109,9 @@ class Layout extends Component {
             }
             this.setState({fileList : files});
             var responseType = 'blob';
-            this.state.matic.files.read(name,responseType)
+            this.state.files.read(name,responseType)
             .then(response => {
-                    if(response !== 'File modified off-chain') {
+                    if(response.validation === undefined) {
                              files[index] = {
                             Name :  name,
                             Hash :  hash,
@@ -178,7 +167,7 @@ class Layout extends Component {
                     fileName={this.state.fileName}
                 /> : null}
                 <div style={{ display: 'flex', color: '#fbfbfb', marginLeft: '42vw' }}>
-                    <Image src={MoiBit} height="60px" width="160px" />
+                    <Image src={MoiBitLogo} height="60px" width="160px" />
                     {/* <h3 style={{ marginTop: '10px', fontSize: '26px' }}>MoiBit</h3> */}
                 </div>
                 <div className="table_body_scrollable">
