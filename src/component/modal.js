@@ -17,7 +17,7 @@ const showModal = (props) => {
                 {props.fileType === "image/png" || props.fileType === "image/jpeg" || props.fileType === "image/gif" ?
 
                     < Image wrapped size='medium' src={props.responseData} style={{ marginLeft: '25%' }} />
-                    : props.fileType === "text/plain" || props.fileType === "text/html" || props.fileType === "text/js" || props.fileType === "text/csv"?
+                    : props.fileType === "text/alert" ?
                         <p>{props.responseData}</p>
                     :
                     <div>

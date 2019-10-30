@@ -3,10 +3,8 @@
 }
 
 .layoutBG {
-  /* background-image: linear-gradient(to bottom, #000000, #241a1f, #3f2d3d, #564462, #655e8b, #6a70a3, #6d83ba, #6c96d1, #72a1d9, #79ade1, #81b8e9, #8ac3f0); */
   height:100vh;
   background-image: linear-gradient(to bottom, #112b4e, #183358, #1f3c63, #26446e, #2d4d79, #345684, #3a5e8f, #41679a, #4971a8, #527cb6, #5a87c4, #6392d3);
-  /* height : -webkit-fill-available; */
   width:100vw;
   padding:50px;
 }
