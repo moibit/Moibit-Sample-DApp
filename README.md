@@ -7,7 +7,7 @@
 
 
 This sample decentralized application uses the [**@moibitjs/matic SDK**](https://github.com/moibit/matic) as an off-chain storage platform for DApps running on [**Matic Network**](https://matic.network).  
-All the file management features demonstrated in the DApp are enabled using the [MoiBit platform](https://www.moibit.io/?utm_source=moibit-github-sample-dapp&utm_medium=github&utm_campaign=matic-sample-dapp).
+All the file management features demonstrated in the DApp are enabled using the [MoiBit platform](https://www.moibit.io/?promocode=matic&utm_source=moibit-github-sample-dapp&utm_medium=github&utm_campaign=matic-sample-dapp).
 
 ## What does the DApp do?
 
@@ -46,9 +46,9 @@ npm install file-saver --save #enable us to download files
 
 > **IMPORTANT NOTE:** Make sure your Metamask is pointing to the matic sidechain. Learn more [here](https://docs.matic.network/newbies/conf-testnet-metamask/).
 
-in **_src/container/dapp**
+in **_src/container/dapp.js**
 
-```js
+``` js
 import React, { Component } from 'react';
 import Layout from '../component/layout.js';
 import '../App.css';
@@ -64,7 +64,7 @@ export default Dapp;
 renders below layout
 ![Sample Dapp Layout](docs/complete_layout.png)
 
-in **_src/component/tableList_**
+in **_src/component/tableList.js_**
 
 ``` js
 import React from 'react';
@@ -382,6 +382,18 @@ class Layout extends Component {
     }
 }
 export default Layout;
+```
+
+If you want to follow the same layout as above, please import the css from [here](https://github.com/moibit/Moibit-Sample-DApp/blob/matic-dapp/src/App.css).
+
+And make sure you have added below script in the **/public/index.html** file to inject semantic.ui css.
+
+`<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />`
+
+We are all set. Yay! Now, execute the command to run the sample application:
+
+``` bash
+npm start
 ```
 
 We have followed the same init script that is there in [Get Started](https://github.com/moibit/matic#get-started) from `@moibitjs/matic` to bind matic object with moibit account.
