@@ -7,7 +7,7 @@
 
 
 This sample decentralized application uses the [**@moibitjs/matic SDK**](https://github.com/moibit/matic) as an off-chain storage platform for DApps running on [**Matic Network**](https://matic.network).  
-All the file management features demonstrated in the DApp are enabled using the [MoiBit platform](https://www.moibit.io/).
+All the file management features demonstrated in the DApp are enabled using the [MoiBit platform](https://www.moibit.io/?utm_source=moibit-github-sample-dapp&utm_medium=github&utm_campaign=matic-sample-dapp).
 
 ## What does the DApp do?
 
