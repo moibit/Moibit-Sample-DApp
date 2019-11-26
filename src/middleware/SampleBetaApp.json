@@ -1,47 +1,24 @@
 [
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_appID",
-				"type": "string"
-			},
-			{
-				"name": "_path",
-				"type": "string"
-			},
-			{
-				"name": "_signedHash",
-				"type": "string"
-			},
-			{
-				"name": "_udf",
-				"type": "string"
-			}
-		],
-		"name": "triggerFileEvent",
-		"outputs": [
-			{
-				"name": "eventLogged",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"constant": true,
 		"inputs": [
 			{
-				"name": "_path",
-				"type": "string"
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "uint256"
 			}
 		],
-		"name": "getSignatureByName",
+		"name": "user_files",
 		"outputs": [
 			{
-				"name": "_signedHash",
+				"name": "fileName",
+				"type": "string"
+			},
+			{
+				"name": "signedFileHash",
 				"type": "string"
 			}
 		],
@@ -51,17 +28,22 @@
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"name": "file2SignedHashes",
+		"inputs": [],
+		"name": "getList",
 		"outputs": [
 			{
-				"name": "",
-				"type": "string"
+				"components": [
+					{
+						"name": "fileName",
+						"type": "string"
+					},
+					{
+						"name": "signedFileHash",
+						"type": "string"
+					}
+				],
+				"name": "retFiles",
+				"type": "tuple[]"
 			}
 		],
 		"payable": false,
@@ -88,7 +70,7 @@
 				"type": "bytes32"
 			}
 		],
-		"name": "getSignedReceipent",
+		"name": "getReceipentFromSignature",
 		"outputs": [
 			{
 				"name": "",
@@ -100,40 +82,64 @@
 		"type": "function"
 	},
 	{
-		"anonymous": false,
+		"constant": true,
 		"inputs": [
 			{
-				"indexed": false,
-				"name": "appID",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "instant",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "fileName",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "signedFileHash",
-				"type": "string"
-			},
-			{
-				"indexed": true,
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "UDF",
+				"name": "",
 				"type": "string"
 			}
 		],
-		"name": "FileEvent",
-		"type": "event"
+		"name": "file2SignedHashes",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_fileName",
+				"type": "string"
+			}
+		],
+		"name": "getSignedHashByFileName",
+		"outputs": [
+			{
+				"name": "_signedFileHash",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_fileName",
+				"type": "string"
+			},
+			{
+				"name": "_signedFileHash",
+				"type": "string"
+			}
+		],
+		"name": "setHash",
+		"outputs": [
+			{
+				"name": "setBool",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]

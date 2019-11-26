@@ -23,7 +23,7 @@ var web3;
   const instance = new web3.eth.Contract(
     BetaAPI,
     //  '0xdBa8EC446B8fa878EE6d0d0C4A73995Ac7486706'
-    '0x331659d84D751904F3d4332E94E4C2A0665fb42c'
+    '0xD49772719Fb3d86698762c6b14b0986dD597dCC9'
   );
   
   export default {
