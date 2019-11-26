@@ -2,35 +2,33 @@ pragma solidity ^0.5.5;
 pragma experimental ABIEncoderV2;
 
 contract SampleBetaAppContract {
-
-    struct File {
-      string fileName;
-      string signedFileHash;
+    
+    // Special CID structure for moibit that holds actual CID and owner signed CID
+    struct MoiBitCID {
+        string fileHash;
+        string signedFileHash;
     }
     
-    // mapping of user address to their list of files
-    mapping(address => File[]) public user_files;
-    mapping (string => string) public file2SignedHashes; 
+    struct MoiBitFile {
+      string fileName;
+      MoiBitCID mCID;
+    }
+    
+    // mapping of user address to their list of moibit files
+    mapping(address => MoiBitFile[]) public user_files;
+    mapping (string => MoiBitCID) public fileName2MoiBitCIDs; 
 
-    // Appending the new hash to user's list of hashes
-    function setHash(string memory _fileName, string memory _signedFileHash) public returns (bool setBool){
-        File memory file = File(_fileName, _signedFileHash);
+    // Appending the new moibitCID to user's list of files
+    function addMoiBitFileRecord(string memory _fileName, string memory _fileHash , string memory _signedFileHash) public returns (bool setBool) {
+        MoiBitCID memory _mCid = MoiBitCID(_fileHash,_signedFileHash);
+        MoiBitFile memory file = MoiBitFile(_fileName, _mCid);
         user_files[msg.sender].push(file);
-        file2SignedHashes[_fileName] = _signedFileHash;
+        fileName2MoiBitCIDs[_fileName] = _mCid;
         return true;
     }
 
-    // Lists all the hashes of the user's files
-    function getList() public view returns (File[] memory retFiles) {
-        return user_files[msg.sender];
-    }
-    
-    // Lists all the hashes of the files independent of the user
-    function getSignedHashByFileName(string memory _fileName) public view returns (string memory _signedFileHash) {
-        return file2SignedHashes[_fileName];
-    }
-    
-    function getReceipentFromSignature(bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) public returns (address) {
-        return ecrecover(msgHash, v, r, s);
+    // Get MoiBit file CID from file Name
+    function getMcidFromFileName (string memory _fileName) public view returns (MoiBitCID memory _mcid ) {
+        return fileName2MoiBitCIDs[_fileName];
     }
 }

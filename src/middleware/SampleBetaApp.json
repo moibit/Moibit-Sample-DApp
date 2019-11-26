@@ -1,5 +1,84 @@
 [
 	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_fileName",
+				"type": "string"
+			},
+			{
+				"name": "_fileHash",
+				"type": "string"
+			},
+			{
+				"name": "_signedFileHash",
+				"type": "string"
+			}
+		],
+		"name": "addMoiBitFileRecord",
+		"outputs": [
+			{
+				"name": "setBool",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"name": "fileName2MoiBitCIDs",
+		"outputs": [
+			{
+				"name": "fileHash",
+				"type": "string"
+			},
+			{
+				"name": "signedFileHash",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_fileName",
+				"type": "string"
+			}
+		],
+		"name": "getMcidFromFileName",
+		"outputs": [
+			{
+				"components": [
+					{
+						"name": "fileHash",
+						"type": "string"
+					},
+					{
+						"name": "signedFileHash",
+						"type": "string"
+					}
+				],
+				"name": "_mcid",
+				"type": "tuple"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"constant": true,
 		"inputs": [
 			{
@@ -18,23 +97,9 @@
 				"type": "string"
 			},
 			{
-				"name": "signedFileHash",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getList",
-		"outputs": [
-			{
 				"components": [
 					{
-						"name": "fileName",
+						"name": "fileHash",
 						"type": "string"
 					},
 					{
@@ -42,104 +107,12 @@
 						"type": "string"
 					}
 				],
-				"name": "retFiles",
-				"type": "tuple[]"
+				"name": "mCID",
+				"type": "tuple"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "msgHash",
-				"type": "bytes32"
-			},
-			{
-				"name": "v",
-				"type": "uint8"
-			},
-			{
-				"name": "r",
-				"type": "bytes32"
-			},
-			{
-				"name": "s",
-				"type": "bytes32"
-			}
-		],
-		"name": "getReceipentFromSignature",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"name": "file2SignedHashes",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_fileName",
-				"type": "string"
-			}
-		],
-		"name": "getSignedHashByFileName",
-		"outputs": [
-			{
-				"name": "_signedFileHash",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_fileName",
-				"type": "string"
-			},
-			{
-				"name": "_signedFileHash",
-				"type": "string"
-			}
-		],
-		"name": "setHash",
-		"outputs": [
-			{
-				"name": "setBool",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]
