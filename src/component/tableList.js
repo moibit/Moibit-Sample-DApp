@@ -1,11 +1,14 @@
 import React from 'react';
 import { Table,Icon } from 'semantic-ui-react';
+import Instance from '../middleware/web3';
+import credentials from '../middleware/credentials'
 import '../App.css';
 class TableList extends React.Component {
     state = {
         props1 : this.props
     }
     componentWillReceiveProps(newProps) {
+        
         this.setState({props1 : newProps});
     }
     render() {
@@ -40,7 +43,11 @@ class TableList extends React.Component {
                         </Table.Row> :
                         this.state.props1.fileList.map(aFile =>
                         <Table.Row key={aFile.fileName}>
-                            <Table.Cell onClick={() => this.state.props1.readFile(aFile.Hash,aFile.Name) } className="hashHover">
+                            <Table.Cell onClick={async () => {
+                                const actualFileName = credentials.API_KEY+"/"+aFile.Name;
+                                const signedHash = await Instance.Config.methods.getSignedHashByFileName(actualFileName).call();
+                                this.state.props1.readFile(signedHash,aFile.Name,aFile.Hash) }
+                             } className="hashHover">
                                 {aFile.Name}
                             </Table.Cell>
                             <Table.Cell colSpan='2'>

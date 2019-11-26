@@ -7,6 +7,7 @@ import credentials from '../middleware/credentials';
 import Instance from '../middleware/web3';
 import axios from 'axios';
 import ShowModal from './modal';
+import Utils from '../middleware/signatureParamsUtil';
 class Layout extends Component {
     state = {
         fileList: [],
@@ -70,6 +71,7 @@ class Layout extends Component {
         }
         this.setState({ fileList: data });
     }
+
     handleSubmit = async (e) => {
         e.preventDefault();
         if (this.state.file !== "") {
@@ -84,16 +86,19 @@ class Layout extends Component {
                 data: formData
             });
             const actualFileName = credentials.API_KEY + "" + response.data.data.Path + "" + response.data.data.Name;
-            await Instance.Config.methods.setHash(actualFileName, response.data.data.Hash).send({ from: this.state.accountId });
-            if (this.state.accountId === credentials.ADMIN) {
-                this.getALLHashes();
+            Utils.getSignature(response.data.data.Hash,this.state.accountId,async (sig) => {
+                console.log(sig)
+                await Instance.Config.methods.setHash(actualFileName,sig).send({ from: this.state.accountId });
+                if (this.state.accountId === credentials.ADMIN) {
+                    this.getALLHashes();
+                    this.setState({ loading: false });
+                }
+                else {
+                    this.getFileHash();
+                    this.setState({ loading: false });
+                }
                 this.setState({ loading: false });
-            }
-            else {
-                this.getFileHash();
-                this.setState({ loading: false });
-            }
-            this.setState({ loading: false });
+            });
         }
         else {
             this.setState({ fieldReq: true })
@@ -169,8 +174,8 @@ class Layout extends Component {
         }
     }
 
-    readFile = async (filehash, fileName) => {
-        if(await this.checkForProvenence(fileName,filehash)) {
+    readFile = async (filehash, fileName,validBoolean) => {
+        if(validBoolean) {
             var responseType = '';
             if (fileName.substr(-3, 3) === "txt" || fileName.substr(-3, 3) === "csv" || fileName.substr(-3, 3) === "php" || fileName.substr(-3, 3) === "html" || fileName.substr(-2, 2) === "js") {
                 responseType = '';
@@ -209,13 +214,20 @@ class Layout extends Component {
             });
         }
         else {
-            this.setState({ readFileIframe: "The file got modified off-chain",
+            this.setState({ readFileIframe: "You are not authorized to see this file",
                             fileType: 'text/plain',
                             fileName: 'Alert!',
                             modalOpen: true
                         });
         }
     }
+
+    verifyAndRead = async (signedFileHash, fileName,fileHash) => {
+        Utils.verifyReceipent(signedFileHash,fileHash,this.state.accountId,(bool) => {
+            this.readFile(fileHash,fileName,bool)
+        })
+    }   
+
     modalClose = () => {
         this.setState({ modalOpen: false });
     }
@@ -277,7 +289,7 @@ class Layout extends Component {
                         </Table>
                     </Form>
                     <div className="content-container">
-                        <TableList fileList={this.state.fileList} readFile={this.readFile}
+                        <TableList fileList={this.state.fileList} readFile={this.verifyAndRead}
                         />
 
                     </div>
