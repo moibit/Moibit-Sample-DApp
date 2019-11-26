@@ -29,21 +29,21 @@ class Layout extends Component {
         axios.defaults.headers.common['api_secret'] = credentials.API_SECRET;
 
         if (acc[0] === credentials.ADMIN) {
-            this.getALLHashes();
+            this.getAdminFiles();
         }
         else {
-            this.getFileHash();
+            this.getUserFiles();
         }
     }
 
-    getFileHash = async () => {
+    getUserFiles = async () => {
         let data = await Instance.Config.methods.getList().call({ from: this.state.accountId });
         let actual = [];
         if(data.length !== 0) {
             for (let i = 0; i < data.length; i++) {
                 actual.push({
                         Name :  data[i].fileName.split("/")[1],
-                        Hash :  data[i].fileHash,
+                        Hash :  data[i].mCID.fileHash,
                         verfiledBoolean : 0
                     });
             }
@@ -51,7 +51,7 @@ class Layout extends Component {
         this.setState({ fileList: actual });
     }
 
-    getALLHashes = async () => {
+    getAdminFiles = async () => {
         let response = await axios({
             method: 'post',
             url: credentials.CUSTOM_URL+"/moibit/listfiles",
@@ -86,15 +86,14 @@ class Layout extends Component {
                 data: formData
             });
             const actualFileName = credentials.API_KEY + "" + response.data.data.Path + "" + response.data.data.Name;
-            Utils.getSignature(response.data.data.Hash,this.state.accountId,async (sig) => {
-                console.log(sig)
-                await Instance.Config.methods.setHash(actualFileName,sig).send({ from: this.state.accountId });
+            Utils.getSignature(response.data.data.Hash,this.state.accountId,async (signature) => {
+                await Instance.Config.methods.addMoiBitFileRecord(actualFileName,response.data.data.Hash,signature).send({ from: this.state.accountId });
                 if (this.state.accountId === credentials.ADMIN) {
-                    this.getALLHashes();
+                    this.getAdminFiles();
                     this.setState({ loading: false });
                 }
                 else {
-                    this.getFileHash();
+                    this.getUserFiles();
                     this.setState({ loading: false });
                 }
                 this.setState({ loading: false });
@@ -177,7 +176,7 @@ class Layout extends Component {
     readFile = async (filehash, fileName,validBoolean) => {
         if(validBoolean) {
             var responseType = '';
-            if (fileName.substr(-3, 3) === "txt" || fileName.substr(-3, 3) === "csv" || fileName.substr(-3, 3) === "php" || fileName.substr(-3, 3) === "html" || fileName.substr(-2, 2) === "js") {
+            if (fileName.substr(-2, 2) === "sh" || fileName.substr(-3, 3) === "txt" || fileName.substr(-3, 3) === "csv" || fileName.substr(-3, 3) === "php" || fileName.substr(-3, 3) === "html" || fileName.substr(-2, 2) === "js") {
                 responseType = '';
             }
             else {

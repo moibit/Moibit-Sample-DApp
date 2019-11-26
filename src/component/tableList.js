@@ -45,8 +45,8 @@ class TableList extends React.Component {
                         <Table.Row key={aFile.fileName}>
                             <Table.Cell onClick={async () => {
                                 const actualFileName = credentials.API_KEY+"/"+aFile.Name;
-                                const signedHash = await Instance.Config.methods.getSignedHashByFileName(actualFileName).call();
-                                this.state.props1.readFile(signedHash,aFile.Name,aFile.Hash) }
+                                const mCID = await Instance.Config.methods.getMcidFromFileName(actualFileName).call();
+                                this.state.props1.readFile(mCID.signedFileHash,aFile.Name,mCID.fileHash) }
                              } className="hashHover">
                                 {aFile.Name}
                             </Table.Cell>

@@ -31,4 +31,9 @@ contract SampleBetaAppContract {
     function getMcidFromFileName (string memory _fileName) public view returns (MoiBitCID memory _mcid ) {
         return fileName2MoiBitCIDs[_fileName];
     }
+    
+    // Get list of user Moibit files
+    function getList() public view returns (MoiBitFile[] memory _files) {
+        return user_files[msg.sender];
+    }
 }

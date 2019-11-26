@@ -1,5 +1,71 @@
 [
 	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "user_files",
+		"outputs": [
+			{
+				"name": "fileName",
+				"type": "string"
+			},
+			{
+				"components": [
+					{
+						"name": "fileHash",
+						"type": "string"
+					},
+					{
+						"name": "signedFileHash",
+						"type": "string"
+					}
+				],
+				"name": "mCID",
+				"type": "tuple"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_fileName",
+				"type": "string"
+			}
+		],
+		"name": "getMcidFromFileName",
+		"outputs": [
+			{
+				"components": [
+					{
+						"name": "fileHash",
+						"type": "string"
+					},
+					{
+						"name": "signedFileHash",
+						"type": "string"
+					}
+				],
+				"name": "_mcid",
+				"type": "tuple"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"constant": false,
 		"inputs": [
 			{
@@ -51,64 +117,32 @@
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"name": "_fileName",
-				"type": "string"
-			}
-		],
-		"name": "getMcidFromFileName",
+		"inputs": [],
+		"name": "getList",
 		"outputs": [
 			{
 				"components": [
 					{
-						"name": "fileHash",
+						"name": "fileName",
 						"type": "string"
 					},
 					{
-						"name": "signedFileHash",
-						"type": "string"
+						"components": [
+							{
+								"name": "fileHash",
+								"type": "string"
+							},
+							{
+								"name": "signedFileHash",
+								"type": "string"
+							}
+						],
+						"name": "mCID",
+						"type": "tuple"
 					}
 				],
-				"name": "_mcid",
-				"type": "tuple"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "user_files",
-		"outputs": [
-			{
-				"name": "fileName",
-				"type": "string"
-			},
-			{
-				"components": [
-					{
-						"name": "fileHash",
-						"type": "string"
-					},
-					{
-						"name": "signedFileHash",
-						"type": "string"
-					}
-				],
-				"name": "mCID",
-				"type": "tuple"
+				"name": "_files",
+				"type": "tuple[]"
 			}
 		],
 		"payable": false,
