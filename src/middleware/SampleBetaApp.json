@@ -3,18 +3,26 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_fileName",
+				"name": "_appID",
 				"type": "string"
 			},
 			{
-				"name": "_fileHash",
+				"name": "_path",
+				"type": "string"
+			},
+			{
+				"name": "_signedHash",
+				"type": "string"
+			},
+			{
+				"name": "_udf",
 				"type": "string"
 			}
 		],
-		"name": "setHash",
+		"name": "triggerFileEvent",
 		"outputs": [
 			{
-				"name": "setBool",
+				"name": "eventLogged",
 				"type": "bool"
 			}
 		],
@@ -26,136 +34,106 @@
 		"constant": true,
 		"inputs": [
 			{
-				"name": "",
-				"type": "uint256"
+				"name": "_path",
+				"type": "string"
 			}
 		],
-		"name": "allFiles",
+		"name": "getSignatureByName",
 		"outputs": [
 			{
-				"name": "fileName",
+				"name": "_signedHash",
 				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"name": "file2SignedHashes",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "msgHash",
+				"type": "bytes32"
 			},
 			{
-				"name": "fileHash",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
+				"name": "v",
+				"type": "uint8"
+			},
 			{
-				"name": "",
-				"type": "string"
+				"name": "r",
+				"type": "bytes32"
+			},
+			{
+				"name": "s",
+				"type": "bytes32"
 			}
 		],
-		"name": "file2Hashes",
+		"name": "getSignedReceipent",
 		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_fileName",
-				"type": "string"
-			}
-		],
-		"name": "getHashByName",
-		"outputs": [
-			{
-				"name": "_fileHash",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getList",
-		"outputs": [
-			{
-				"components": [
-					{
-						"name": "fileName",
-						"type": "string"
-					},
-					{
-						"name": "fileHash",
-						"type": "string"
-					}
-				],
-				"name": "retFiles",
-				"type": "tuple[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "listAllHashes",
-		"outputs": [
-			{
-				"components": [
-					{
-						"name": "fileName",
-						"type": "string"
-					},
-					{
-						"name": "fileHash",
-						"type": "string"
-					}
-				],
-				"name": "retFiles",
-				"type": "tuple[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
 			{
 				"name": "",
 				"type": "address"
-			},
-			{
-				"name": "",
-				"type": "uint256"
 			}
 		],
-		"name": "user_files",
-		"outputs": [
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
 			{
+				"indexed": false,
+				"name": "appID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "instant",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
 				"name": "fileName",
 				"type": "string"
 			},
 			{
-				"name": "fileHash",
+				"indexed": false,
+				"name": "signedFileHash",
+				"type": "string"
+			},
+			{
+				"indexed": true,
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "UDF",
 				"type": "string"
 			}
 		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
+		"name": "FileEvent",
+		"type": "event"
 	}
 ]
