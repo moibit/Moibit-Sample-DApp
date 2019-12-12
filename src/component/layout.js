@@ -19,9 +19,9 @@ class Layout extends Component {
         fileType: '',
         modalOpen: false,
         fileName: '',
+        targetedIndex : 0
     }
     async componentDidMount() {
-
         let acc = await Instance.web3.eth.getAccounts();
         this.setState({ accountId: acc[0] });
         this.observe();
@@ -121,59 +121,8 @@ class Layout extends Component {
         }
     }
 
-    checkForProvenence = async (name,hash) => {
-        let response = await axios({
-            method: 'post',
-            url: credentials.CUSTOM_URL+"/moibit/listfiles",
-            data: { path: "/" }
-        });
-
-        let allFiles = response.data.data.Entries;
-        const index1 = allFiles.map(e => e.Name).indexOf(name);
-        let checkingHash = '';
-        if(index1 != -1) {
-            checkingHash = allFiles[index1].Hash;
-        }
-        
-
-        let successs = true;
-        let files = this.state.fileList;
-        const index = files.map(e => e.Name).indexOf(name);
-        if(files[index].verfiledBoolean === 0) {
-            files[index] = {
-                Name :  name,
-                Hash :  hash,
-                verfiledBoolean : 2
-            }
-            this.setState({fileList : files});
-
-            /* we are rendering all the root files so we are adding / in prefix to file name */
-            const filename = credentials.API_KEY+'/'+name; 
-            if(checkingHash == await Instance.Config.methods.getHashByName(filename).call()) {
-                files[index] = {
-                    Name :  name,
-                    Hash :  hash,
-                    verfiledBoolean : 1
-                }
-                this.setState({fileList : files});
-            }
-            else {
-                files[index] = {
-                    Name :  name,
-                    Hash :  hash,
-                    verfiledBoolean : -1
-                }
-                this.setState({fileList : files});
-                successs = false;
-            }
-            return successs;
-        }
-        else {
-            return successs;
-        }
-    }
-
     readFile = async (filehash, fileName,validBoolean) => {
+        let updatedFilesState = this.state.fileList;
         if(validBoolean) {
             var responseType = '';
             if (fileName.substr(-2, 2) === "sh" || fileName.substr(-3, 3) === "txt" || fileName.substr(-3, 3) === "csv" || fileName.substr(-3, 3) === "php" || fileName.substr(-3, 3) === "html" || fileName.substr(-2, 2) === "js") {
@@ -192,6 +141,11 @@ class Layout extends Component {
                 }
             })
             .then(response => {
+                updatedFilesState[this.state.targetedIndex] = {
+                    Name :  fileName,
+                    Hash :  filehash,
+                    verfiledBoolean : 1
+                }
                 if (typeof (response.data) == "string") {
                     this.setState({ readFileIframe: response.data,
                         fileType: response.headers['content-type'],
@@ -213,15 +167,31 @@ class Layout extends Component {
             });
         }
         else {
-            this.setState({ readFileIframe: "You are not authorized to see this file",
+            updatedFilesState[this.state.targetedIndex] = {
+                Name :  fileName,
+                Hash :  filehash,
+                verfiledBoolean : -1
+            }
+            this.setState({ 
+                            readFileIframe: "You are not authorized to see this file",
                             fileType: 'text/plain',
                             fileName: 'Alert!',
                             modalOpen: true
                         });
         }
+        this.setState({fileList : updatedFilesState})
     }
 
     verifyAndRead = async (signedFileHash, fileName,fileHash) => {
+        let currentFilesState = this.state.fileList;
+        const currentFile = currentFilesState.filter(f => f['Hash'] === fileHash);
+        const targetedIndex = currentFilesState.indexOf(currentFile[0]);
+        currentFilesState[targetedIndex] = {
+            Name :  fileName,
+            Hash :  fileHash,
+            verfiledBoolean : 2
+        }
+        this.setState({ fileList : currentFilesState , targetedIndex : targetedIndex });
         Utils.verifyReceipent(signedFileHash,fileHash,this.state.accountId,(bool) => {
             this.readFile(fileHash,fileName,bool)
         })

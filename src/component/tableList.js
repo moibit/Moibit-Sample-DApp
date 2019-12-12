@@ -28,7 +28,7 @@ class TableList extends React.Component {
                             File Hash
                                         </Table.HeaderCell>
                         <Table.HeaderCell textAlign="center" style={custom_primary}>
-                            Verified (Auto verification happens when you view file)
+                            Authorization (Auto authorization happens when you view file)
                                         </Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
@@ -56,7 +56,7 @@ class TableList extends React.Component {
     
                             <Table.Cell textAlign="center">
                                 {aFile.verfiledBoolean == 0 ? 
-                                    <h5 style={{color:'blue'}}>Unverified</h5> : 
+                                    <h5 style={{color:'blue'}}>No Attempt</h5> : 
                                     aFile.verfiledBoolean == 1 ? 
                                     <h5 style={{color:'green'}}>Passed</h5> : 
                                     aFile.verfiledBoolean == -1 ? 
