@@ -5,8 +5,7 @@ import MoiBitLogo from '../moibit_logo_transparent.png';
 import TableList from './tableList';
 import credentials from '../middleware/credentials';
 import ShowModal from './modal';
-import Matic from 'maticjs';
-import MFiles from '@moibitjs/matic';
+import MoiBit from '@moibitjs/core';
 class Layout extends Component {
     state = {
         fileList: [],
@@ -17,35 +16,33 @@ class Layout extends Component {
         fileType: '',
         modalOpen: false,
         fileName: '',
-        files : {},
+        moibitSdk : {},
         API_KEY : '',
         API_SECRET : ''
     }
     async componentDidMount() {
         try {
-            let _matic = new Matic({ 
-                parentProvider : 'https://ropsten.infura.io/v3/70645f042c3a409599c60f96f6dd9fbc',
-                maticProvider : window.web3.currentProvider 
+            let moibitSdk = new MoiBit(credentials.CUSTOM_URL,{
+                public : credentials.API_KEY,
+                secret : credentials.API_SECRET
             });
-
-            var files = new MFiles(_matic);
-            await files.init(credentials.CUSTOM_URL,{
-                API_KEY : credentials.API_KEY,
-                API_SECRET : credentials.API_SECRET
-            });
+            
             this.setState({
-                files : files,
+                moibitSdk : moibitSdk,
                 API_KEY : credentials.API_KEY,
                 API_SECRET : credentials.API_SECRET
+            },()=>{
+                this.getALLHashes()
             });
-            this.getALLHashes();
+           
         }catch(e) {
             console.log(e);       
         }
     }
 
     getALLHashes = async () => {
-        let response = await this.state.files.list();
+        let response = await this.state.moibitSdk.list();
+        response = response.data.data['Entries'];
         let data = [];
         if(response !== null) {
             for (let i = 0; i < response.length; i++) {
@@ -62,15 +59,21 @@ class Layout extends Component {
     }
 
     handleSubmit = async (e) => {
-        e.preventDefault();
-        if (this.state.file !== "") {
-            this.setState({ loading: true });
-            await this.state.files.add(this.state.file,this.state.file.name);
-            this.setState({ loading: false });
-            this.getALLHashes();
-        }
-        else {
-            this.setState({ fieldReq: true })
+        try {
+            e.preventDefault();
+            if (this.state.file !== "") {
+                this.setState({ loading: true });
+                await this.state.moibitSdk.addFile(this.state.file,{
+                    fileName : this.state.file.name
+                });
+                this.setState({ loading: false });
+                this.getALLHashes();
+            }
+            else {
+                this.setState({ fieldReq: true })
+            }
+        }catch(e) {
+            console.log(e)
         }
     }
 
@@ -86,36 +89,36 @@ class Layout extends Component {
             }
             this.setState({fileList : files});
             var responseType = 'blob';
-            this.state.files.read(name,responseType)
+            this.state.moibitSdk.readFileByHash(hash,responseType)
             .then(response => {
-                    if(response.validation === undefined) {
-                             files[index] = {
+                    // if(response.validation === undefined) {
+                        files[index] = {
                             Name :  name,
                             Hash :  hash,
                             verfiledBoolean : 1
                         }
                         this.setState({
                             fileList : files,
-                            readFileIframe: window.URL.createObjectURL(new Blob([response.data], {type:response.contentType})),
-                            fileType: response.contentType,
+                            readFileIframe: window.URL.createObjectURL(new Blob([response.data], {type:response.headers['content-type']})),
+                            fileType: response.headers['content-type'],
                             fileName: name,
                             modalOpen: true 
                         })
-                    }
-                    else {
-                        files[index] = {
-                                    Name :  name,
-                                    Hash :  hash,
-                                    verfiledBoolean : -1
-                        }
-                        this.setState({
-                            fileList : files,
-                            readFileIframe: "App cannot verify the file as the current hash is not recorded on matic network",
-                            fileType: 'text/alert',
-                            fileName: 'Unable to render file',
-                            modalOpen: true
-                        });
-                    }
+                    // }
+                    // else {
+                    //     files[index] = {
+                    //                 Name :  name,
+                    //                 Hash :  hash,
+                    //                 verfiledBoolean : -1
+                    //     }
+                    //     this.setState({
+                    //         fileList : files,
+                    //         readFileIframe: "App cannot verify the file as the current hash is not recorded on matic network",
+                    //         fileType: 'text/alert',
+                    //         fileName: 'Unable to render file',
+                    //         modalOpen: true
+                    //     });
+                    // }
             })
             .catch(error => {
                 console.log(error);
@@ -150,10 +153,9 @@ class Layout extends Component {
                 <div className="table_body_scrollable">
                     <Form onSubmit={(event) => this.handleSubmit(event)} encType="multipart/form-data">
                         <Table celled size="small" style={{ marginTop: '20px', marginBottom: '40px', background: '#f2f2f2', color: '#222222' }}>
-                            <Table.Header>
+                            <Table.Body>
                                 <Table.Row>
-
-                                    <Table.HeaderCell style={custom_header}>
+                                    <Table.Cell style={custom_header}>
                                         <Table.Row>
                                             <Table.Cell textAlign="center" colSpan='2'>
                                                 <Input type="file" onChange={(e) => {
@@ -166,9 +168,9 @@ class Layout extends Component {
                                                 <Button primary type="submit" loading={this.state.loading} disabled={this.state.loading} >Submit</Button>
                                             </Table.Cell>
                                         </Table.Row>
-                                    </Table.HeaderCell>
+                                    </Table.Cell>
 
-                                    <Table.HeaderCell style={custom_header}>
+                                    <Table.Cell style={custom_header}>
                                         <Table.Row>
                                             <Table.Cell colSpan='2'>
                                                 API_KEY : {this.state.API_KEY}
@@ -181,15 +183,13 @@ class Layout extends Component {
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
-                                    </Table.HeaderCell>
+                                    </Table.Cell>
                                 </Table.Row>
-                            </Table.Header>
+                            </Table.Body>
                         </Table>
                     </Form>
                     <div className="content-container">
-                        <TableList fileList={this.state.fileList} readFile={this.readFile}
-                        />
-
+                        <TableList fileList={this.state.fileList} readFile={this.readFile} />
                     </div>
                 </div>
             </div>
