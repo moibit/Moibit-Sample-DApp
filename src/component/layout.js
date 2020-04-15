@@ -23,8 +23,8 @@ class Layout extends Component {
     async componentDidMount() {
         try {
             let moibitSdk = new MoiBit(credentials.CUSTOM_URL,{
-                public : credentials.API_KEY,
-                secret : credentials.API_SECRET
+                api_key : credentials.API_KEY,
+                api_secret : credentials.API_SECRET
             });
             
             this.setState({

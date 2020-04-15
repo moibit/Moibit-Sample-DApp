@@ -3,3 +3,4 @@ yarn.lock
 
 build
 node_modules
+src/middleware/credentials.js
