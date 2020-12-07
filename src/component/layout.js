@@ -45,7 +45,8 @@ class Layout extends Component {
     }
 
     getALLHashes = async () => {
-        let response = await this.state.files.list();
+        let response = await this.state.files.list('/');
+        response = response.data.data.Entries;
         let data = [];
         if(response !== null) {
             for (let i = 0; i < response.length; i++) {
